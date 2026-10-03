@@ -1,0 +1,71 @@
+# ------------------------------------------------------------
+#  skript-dancing-cat (English edition)
+#  https://github.com/Im-Tim-mI/skript-dancing-cat
+#  Copyright (c) 2026 廷廷小教室、廷廷的家（Tim945）
+#  License: MIT + Commons Clause (see LICENSE)
+# ------------------------------------------------------------
+
+# ============================================
+# Dancing Cat
+# Command: /dancingcat (alias: /cat)
+# ============================================
+
+options:
+    prefix: &d[Dancing Cat]
+
+command /dancingcat:
+    aliases: /cat
+    executable by: players
+    trigger:
+        # Take the player's horizontal facing direction and summon the cat on the ground 5 blocks ahead.
+        set {_base} to location of player
+        set {_direction} to {_base}.getDirection()
+        {_direction}.setY(0)
+        {_direction}.normalize()
+        {_direction}.multiply(5)
+        {_base}.add({_direction})
+        set {_base} to highest block at {_base}
+        add 0.5 to x-coordinate of {_base}
+        add 1 to y-coordinate of {_base}
+        add 0.5 to z-coordinate of {_base}
+
+        spawn a cat at {_base}
+        set {_cat} to last spawned entity
+
+        # The cat only dances: it won't walk away and can't be hurt.
+        {_cat}.setAI(false)
+        {_cat}.setGravity(false)
+        {_cat}.setInvulnerable(true)
+        {_cat}.setCollidable(false)
+        {_cat}.setSilent(true)
+        {_cat}.setPersistent(false)
+        {_cat}.setCustomName("§d§lDancing Cat")
+        {_cat}.setCustomNameVisible(true)
+
+        send "{@prefix} &fThe cat starts spinning!" to player
+        play sound "BLOCK_NOTE_BLOCK_PLING" with volume 1.5 with pitch 1 at {_base}
+
+        set {_yaw} to yaw of {_base}
+
+        # Turn 18 degrees every game tick and keep spinning for about five seconds (no more step-by-step dance moves).
+        loop 100 times:
+            add 18 to {_yaw}
+            set {_dance} to {_base}
+            set yaw of {_dance} to {_yaw}
+            teleport {_cat} to {_dance}
+
+            # While spinning, play notes from the cat's position so nearby players hear them depending on distance.
+            if loop-number is 21:
+                play sound "BLOCK_NOTE_BLOCK_PLING" with volume 1.5 with pitch 1.2 at {_base}
+            else if loop-number is 41:
+                play sound "BLOCK_NOTE_BLOCK_PLING" with volume 1.5 with pitch 1.4 at {_base}
+            else if loop-number is 61:
+                play sound "BLOCK_NOTE_BLOCK_PLING" with volume 1.5 with pitch 1.6 at {_base}
+            else if loop-number is 81:
+                play sound "BLOCK_NOTE_BLOCK_PLING" with volume 1.5 with pitch 1.8 at {_base}
+
+            wait 1 tick
+
+        play sound "ENTITY_CAT_PURR" with volume 1.5 with pitch 1.2 at {_base}
+        send "{@prefix} &fShow's over - the cat vanished!" to player
+        {_cat}.remove()

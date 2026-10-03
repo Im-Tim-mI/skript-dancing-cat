@@ -1,0 +1,70 @@
+# ------------------------------------------------------------
+#  skript-dancing-cat（繁體中文版）
+#  https://github.com/Im-Tim-mI/skript-dancing-cat
+#  Copyright (c) 2026 廷廷小教室、廷廷的家（Tim945）
+#  授權：MIT + Commons Clause（詳見 LICENSE）
+# ------------------------------------------------------------
+
+# ============================================
+# 跳舞貓咪
+# 指令：/貓咪
+# ============================================
+
+options:
+    prefix: &d[跳舞貓咪]
+
+command /貓咪:
+    executable by: players
+    trigger:
+        # 取玩家面向的水平方向，在正前方 5 格的地面上召喚。
+        set {_base} to location of player
+        set {_direction} to {_base}.getDirection()
+        {_direction}.setY(0)
+        {_direction}.normalize()
+        {_direction}.multiply(5)
+        {_base}.add({_direction})
+        set {_base} to highest block at {_base}
+        add 0.5 to x-coordinate of {_base}
+        add 1 to y-coordinate of {_base}
+        add 0.5 to z-coordinate of {_base}
+
+        spawn a cat at {_base}
+        set {_cat} to last spawned entity
+
+        # 讓貓咪只進行舞蹈動作，不會走開或受到傷害。
+        {_cat}.setAI(false)
+        {_cat}.setGravity(false)
+        {_cat}.setInvulnerable(true)
+        {_cat}.setCollidable(false)
+        {_cat}.setSilent(true)
+        {_cat}.setPersistent(false)
+        {_cat}.setCustomName("§d§l跳舞貓咪")
+        {_cat}.setCustomNameVisible(true)
+
+        send "{@prefix} &f貓咪開始旋轉了！" to player
+        play sound "BLOCK_NOTE_BLOCK_PLING" with volume 1.5 with pitch 1 at {_base}
+
+        set {_yaw} to yaw of {_base}
+
+        # 每遊戲刻轉動 18 度，連續旋轉約五秒，不再使用分段舞步。
+        loop 100 times:
+            add 18 to {_yaw}
+            set {_dance} to {_base}
+            set yaw of {_dance} to {_yaw}
+            teleport {_cat} to {_dance}
+
+            # 旋轉期間從貓咪位置播放音符，讓周圍玩家依距離聽見。
+            if loop-number is 21:
+                play sound "BLOCK_NOTE_BLOCK_PLING" with volume 1.5 with pitch 1.2 at {_base}
+            else if loop-number is 41:
+                play sound "BLOCK_NOTE_BLOCK_PLING" with volume 1.5 with pitch 1.4 at {_base}
+            else if loop-number is 61:
+                play sound "BLOCK_NOTE_BLOCK_PLING" with volume 1.5 with pitch 1.6 at {_base}
+            else if loop-number is 81:
+                play sound "BLOCK_NOTE_BLOCK_PLING" with volume 1.5 with pitch 1.8 at {_base}
+
+            wait 1 tick
+
+        play sound "ENTITY_CAT_PURR" with volume 1.5 with pitch 1.2 at {_base}
+        send "{@prefix} &f表演結束，貓咪消失了！" to player
+        {_cat}.remove()

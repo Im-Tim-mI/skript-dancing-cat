@@ -1,0 +1,18 @@
+# ------------------------------------------------------------
+#  skript-dancing-cat (English edition) - optional add-on
+#  https://github.com/Im-Tim-mI/skript-dancing-cat
+#  Copyright (c) 2026 廷廷小教室、廷廷的家（Tim945）
+#  License: MIT + Commons Clause (see LICENSE)
+# ------------------------------------------------------------
+
+# ============================================
+# Auto Cat on Join
+# Runs /dancingcat automatically once a player has joined and finished loading.
+# Kept separate from dancing-cat.sk so it can be enabled or disabled on its own.
+# ============================================
+
+on join:
+    set {_p} to player
+    wait 3 seconds
+    if {_p} is online:
+        make {_p} execute command "/dancingcat"
